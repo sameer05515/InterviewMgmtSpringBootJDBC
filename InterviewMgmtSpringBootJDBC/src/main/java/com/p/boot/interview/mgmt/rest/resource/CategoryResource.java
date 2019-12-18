@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.p.boot.interview.mgmt.aspect.TrackTime;
 import com.p.boot.interview.mgmt.pojo.CategoryDTO;
 import com.p.boot.interview.mgmt.repository.CategoryRepository;
 
@@ -26,6 +27,7 @@ public class CategoryResource {
 	private static final Logger logger = LoggerFactory.getLogger(CategoryResource.class);
 	
 	@GetMapping(path="/", produces = "application/json")
+	@TrackTime
 	public List<CategoryDTO> getAllCategories() {
 		
 		return categoryRepository.findAll();
