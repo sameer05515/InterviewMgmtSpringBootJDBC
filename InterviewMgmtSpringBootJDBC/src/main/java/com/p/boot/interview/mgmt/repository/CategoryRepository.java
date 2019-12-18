@@ -26,7 +26,7 @@ public interface CategoryRepository {
 
     int update(CategoryDTO book);
 
-    int deleteById(Long id);
+    String deleteById(int id);
 
     List<CategoryDTO> findAll();
 

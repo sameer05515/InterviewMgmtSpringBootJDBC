@@ -14,7 +14,7 @@ import java.util.List;
 import java.util.Optional;
 
 @Repository
-public class NamedParameterJdbcBookRepository extends JdbcCategoryRepository {
+public class NamedParameterJdbcCategoryRepository extends JdbcCategoryRepository {
 
     @Autowired
     private NamedParameterJdbcTemplate namedParameterJdbcTemplate;
@@ -33,15 +33,15 @@ public class NamedParameterJdbcBookRepository extends JdbcCategoryRepository {
                 new MapSqlParameterSource("id", id),
                 (rs, rowNum) ->
                         Optional.of(new CategoryDTO(
-                                rs.getLong("id"),
-                                rs.getString("name"),
-                                rs.getBigDecimal("price")
+//                                rs.getLong("id"),
+//                                rs.getString("name"),
+//                                rs.getBigDecimal("price")
                         ))
         );
     }
 
     @Override
-    public List<Book> findByNameAndPrice(String name, BigDecimal price) {
+    public List<CategoryDTO> findByNameAndPrice(String name, BigDecimal price) {
 
         MapSqlParameterSource mapSqlParameterSource = new MapSqlParameterSource();
         mapSqlParameterSource.addValue("name", "%" + name + "%");
@@ -52,9 +52,9 @@ public class NamedParameterJdbcBookRepository extends JdbcCategoryRepository {
                 mapSqlParameterSource,
                 (rs, rowNum) ->
                         new CategoryDTO(
-                                rs.getLong("id"),
-                                rs.getString("name"),
-                                rs.getBigDecimal("price")
+//                                rs.getLong("id"),
+//                                rs.getString("name"),
+//                                rs.getBigDecimal("price")
                         )
         );
     }

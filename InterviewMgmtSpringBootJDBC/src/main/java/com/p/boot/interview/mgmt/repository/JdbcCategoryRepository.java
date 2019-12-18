@@ -5,6 +5,7 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.math.BigDecimal;
+import java.sql.Date;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -30,7 +31,7 @@ import com.p.boot.interview.mgmt.pojo.CategoryDTO;
 public class JdbcCategoryRepository implements CategoryRepository {
 
 	@Override
-	public final boolean keyExists(CategoryDTO objCategoryDTO) {
+	public boolean keyExists(CategoryDTO objCategoryDTO) {
 
 		int i = jdbcTemplate.queryForObject(
 				"select cat_id,cat_name,creation_date,last_updation_date,rating " + "from t_category where cat_id=?",
@@ -40,7 +41,7 @@ public class JdbcCategoryRepository implements CategoryRepository {
 	}
 
 	@Override
-	public final synchronized int generateNextsrno() {
+	public synchronized int generateNextsrno() {
 
 		int maxId = jdbcTemplate.queryForObject("select max(cat_id) from t_category", Integer.class);
 
@@ -52,8 +53,8 @@ public class JdbcCategoryRepository implements CategoryRepository {
 	@Autowired
 	private JdbcTemplate jdbcTemplate;
 
-	@Autowired
-	LobHandler lobHandler;
+//	@Autowired
+//	LobHandler lobHandler;
 
 	@Override
 	public int count() {
@@ -76,17 +77,54 @@ public class JdbcCategoryRepository implements CategoryRepository {
 	}
 
 	@Override
-	public int deleteById(Long id) {
-		return jdbcTemplate.update("delete books where id = ?", id);
+	public String deleteById(int id) {
+		boolean isSuccess = jdbcTemplate.update("delete from t_category where cat_id=?", id) > 0;
+
+		String msg = "";
+
+		if (isSuccess) {
+			msg = "category deleted from database ";
+		} else {
+			msg = "Unable to delete category from database ";
+		}
+
+		return msg;
+
 	}
 
 	@Override
 	public List<CategoryDTO> findAll() {
-		return jdbcTemplate.query("select * from books", (rs, rowNum) -> new CategoryDTO(
-		// rs.getLong("id"),
-		// rs.getString("name"),
-		// rs.getBigDecimal("price")
-		));
+		// return jdbcTemplate.query(
+		// "select cat_id,cat_name,creation_date,last_updation_date,rating from
+		// t_category order by last_updation_date desc",
+		// (rs, rowNum) -> new CategoryDTO(
+		// // rs.getLong("id"),
+		// // rs.getString("name"),
+		// // rs.getBigDecimal("price")
+		// ));
+
+		return jdbcTemplate.query(
+				"select cat_id,cat_name,creation_date,last_updation_date,rating from t_category order by last_updation_date desc",
+				new RowMapper<CategoryDTO>() {
+
+					@Override
+					public CategoryDTO mapRow(ResultSet rs, int rowNum) throws SQLException {
+						// TODO Auto-generated method stub
+						CategoryDTO objCategoryDTO = new CategoryDTO();
+						objCategoryDTO.setCatID(rs.getInt("cat_id"));
+						objCategoryDTO.setCatgoryName(rs.getString("cat_name"));
+
+						java.sql.Timestamp timestamp = rs.getTimestamp("creation_date");
+						objCategoryDTO.setDateCreated(Date.from(timestamp.toInstant()));
+						timestamp = rs.getTimestamp("last_updation_date");
+						objCategoryDTO.setDateLastModified(Date.from(timestamp.toInstant()));
+
+						objCategoryDTO.setRating(rs.getInt("rating"));
+
+						return objCategoryDTO;
+					}
+
+				});
 	}
 
 	// jdbcTemplate.queryForObject, populates a single object
@@ -188,20 +226,20 @@ public class JdbcCategoryRepository implements CategoryRepository {
 	@Override
 	public void saveImage(Long bookId, File image) {
 
-		try (InputStream imageInStream = new FileInputStream(image)) {
-
-			jdbcTemplate.execute("INSERT INTO book_image (book_id, filename, blob_image) VALUES (?, ?, ?)",
-					new AbstractLobCreatingPreparedStatementCallback(lobHandler) {
-						protected void setValues(PreparedStatement ps, LobCreator lobCreator) throws SQLException {
-							ps.setLong(1, 1L);
-							ps.setString(2, image.getName());
-							lobCreator.setBlobAsBinaryStream(ps, 3, imageInStream, (int) image.length());
-						}
-					});
-
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
+//		try (InputStream imageInStream = new FileInputStream(image)) {
+//
+//			jdbcTemplate.execute("INSERT INTO book_image (book_id, filename, blob_image) VALUES (?, ?, ?)",
+//					new AbstractLobCreatingPreparedStatementCallback(lobHandler) {
+//						protected void setValues(PreparedStatement ps, LobCreator lobCreator) throws SQLException {
+//							ps.setLong(1, 1L);
+//							ps.setString(2, image.getName());
+//							lobCreator.setBlobAsBinaryStream(ps, 3, imageInStream, (int) image.length());
+//						}
+//					});
+//
+//		} catch (IOException e) {
+//			e.printStackTrace();
+//		}
 
 	}
 
@@ -214,7 +252,7 @@ public class JdbcCategoryRepository implements CategoryRepository {
 					public Map<String, InputStream> mapRow(ResultSet rs, int i) throws SQLException {
 
 						String fileName = rs.getString("filename");
-						InputStream blob_image_stream = lobHandler.getBlobAsBinaryStream(rs, "blob_image");
+//						InputStream blob_image_stream = lobHandler.getBlobAsBinaryStream(rs, "blob_image");
 
 						// byte array
 						// Map<String, Object> results = new HashMap<>();
@@ -222,7 +260,7 @@ public class JdbcCategoryRepository implements CategoryRepository {
 						// results.put("BLOB", blobBytes);
 
 						Map<String, InputStream> results = new HashMap<>();
-						results.put(fileName, blob_image_stream);
+//						results.put(fileName, blob_image_stream);
 
 						return results;
 
