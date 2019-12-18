@@ -42,7 +42,7 @@ public class InterviewMgmtSpringBootJdbcApplication implements CommandLineRunner
 	void startCustomerApp() {
 
 		log.info("[FIND_ALL]");
-		log.info("{}", categoryRepository.findAll());
+		log.info("all categories data : {}", categoryRepository.findAll());
 //		log.info(categoryRepository.findAll());
 	}
 
