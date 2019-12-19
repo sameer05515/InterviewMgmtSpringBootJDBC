@@ -32,9 +32,9 @@ public interface CategoryRepository {
 
     List<CategoryDTO> findByNameAndPrice(String name, BigDecimal price);
 
-    Optional<CategoryDTO> findById(Long id);
+    CategoryDTO findById(int id);
 
-    String findNameById(Long id);
+    String findNameById(int id);
 
     int[] batchInsert(List<CategoryDTO> books);
 

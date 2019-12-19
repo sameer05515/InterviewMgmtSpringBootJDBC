@@ -129,13 +129,28 @@ public class JdbcCategoryRepository implements CategoryRepository {
 
 	// jdbcTemplate.queryForObject, populates a single object
 	@Override
-	public Optional<CategoryDTO> findById(Long id) {
-		return jdbcTemplate.queryForObject("select * from books where id = ?", new Object[] { id },
-				(rs, rowNum) -> Optional.of(new CategoryDTO(
-				// rs.getLong("id"),
-				// rs.getString("name"),
-				// rs.getBigDecimal("price")
-				)));
+	public CategoryDTO findById(int id) {
+		return jdbcTemplate.queryForObject("select * from t_category where cat_id = ?", new Object[] { id },
+				new RowMapper<CategoryDTO>() {
+
+			@Override
+			public CategoryDTO mapRow(ResultSet rs, int rowNum) throws SQLException {
+				// TODO Auto-generated method stub
+				CategoryDTO objCategoryDTO = new CategoryDTO();
+				objCategoryDTO.setCatID(rs.getInt("cat_id"));
+				objCategoryDTO.setCatgoryName(rs.getString("cat_name"));
+
+				java.sql.Timestamp timestamp = rs.getTimestamp("creation_date");
+				objCategoryDTO.setDateCreated(Date.from(timestamp.toInstant()));
+				timestamp = rs.getTimestamp("last_updation_date");
+				objCategoryDTO.setDateLastModified(Date.from(timestamp.toInstant()));
+
+				objCategoryDTO.setRating(rs.getInt("rating"));
+
+				return objCategoryDTO;
+			}
+
+		});
 	}
 
 	@Override
@@ -149,7 +164,7 @@ public class JdbcCategoryRepository implements CategoryRepository {
 	}
 
 	@Override
-	public String findNameById(Long id) {
+	public String findNameById(int id) {
 		return jdbcTemplate.queryForObject("select name from books where id = ?", new Object[] { id }, String.class);
 	}
 
