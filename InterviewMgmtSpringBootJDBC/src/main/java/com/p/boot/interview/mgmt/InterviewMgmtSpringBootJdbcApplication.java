@@ -12,8 +12,6 @@ import org.springframework.jdbc.core.JdbcTemplate;
 
 import com.p.boot.interview.mgmt.repository.CategoryRepository;
 
-
-
 @SpringBootApplication
 @ComponentScan("com.p.boot.interview.mgmt")
 public class InterviewMgmtSpringBootJdbcApplication implements CommandLineRunner {
@@ -22,10 +20,10 @@ public class InterviewMgmtSpringBootJdbcApplication implements CommandLineRunner
 
 	@Autowired
 	JdbcTemplate jdbcTemplate;
-	
+
 	@Autowired
-	@Qualifier("namedParameterJdbcCategoryRepository")  // Test NamedParameterJdbcTemplate
-    private CategoryRepository categoryRepository;
+	@Qualifier("namedParameterJdbcCategoryRepository") // Test NamedParameterJdbcTemplate
+	private CategoryRepository categoryRepository;
 
 	public static void main(String[] args) {
 		SpringApplication.run(InterviewMgmtSpringBootJdbcApplication.class, args);
@@ -35,15 +33,15 @@ public class InterviewMgmtSpringBootJdbcApplication implements CommandLineRunner
 
 		log.info("StartApplication...");
 
-		startCustomerApp();
+		// startCustomerApp();
 
 	}
 
-	void startCustomerApp() {
-
-		log.info("[FIND_ALL]");
-		log.info("all categories data : {}", categoryRepository.findAll());
-//		log.info(categoryRepository.findAll());
-	}
+	// private void startCustomerApp() {
+	//
+	// log.info("[FIND_ALL]");
+	// log.info("all categories data : {}", categoryRepository.findAll());
+	//
+	// }
 
 }

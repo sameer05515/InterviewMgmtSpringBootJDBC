@@ -1,8 +1,6 @@
 package com.p.boot.interview.mgmt.repository;
 
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
 import java.io.InputStream;
 import java.math.BigDecimal;
 import java.sql.Date;
@@ -12,16 +10,12 @@ import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.BatchPreparedStatementSetter;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.ParameterizedPreparedStatementSetter;
 import org.springframework.jdbc.core.RowMapper;
-import org.springframework.jdbc.core.support.AbstractLobCreatingPreparedStatementCallback;
-import org.springframework.jdbc.support.lob.LobCreator;
-import org.springframework.jdbc.support.lob.LobHandler;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -53,27 +47,12 @@ public class JdbcCategoryRepository implements CategoryRepository {
 	@Autowired
 	private JdbcTemplate jdbcTemplate;
 
-//	@Autowired
-//	LobHandler lobHandler;
+	// @Autowired
+	// LobHandler lobHandler;
 
 	@Override
 	public int count() {
 		return jdbcTemplate.queryForObject("select count(*) from t_category", Integer.class);
-	}
-
-	@Override
-	public int save(CategoryDTO objCategoryDTO) {
-
-		java.sql.Timestamp date = new java.sql.Timestamp(new java.util.Date().getTime());
-
-		return jdbcTemplate.update(
-				"insert into t_category (cat_id,cat_name,creation_date,last_updation_date,rating) values (?,?,?,?,?)",
-				generateNextsrno(), objCategoryDTO.getCatgoryName(), date, date, objCategoryDTO.getRating());
-	}
-
-	@Override
-	public int update(CategoryDTO book) {
-		return jdbcTemplate.update("update books set price = ? where id = ?", book.getCatgoryName(), book.getCatID());
 	}
 
 	@Override
@@ -133,27 +112,27 @@ public class JdbcCategoryRepository implements CategoryRepository {
 		return jdbcTemplate.queryForObject("select * from t_category where cat_id = ?", new Object[] { id },
 				new RowMapper<CategoryDTO>() {
 
-			@Override
-			public CategoryDTO mapRow(ResultSet rs, int rowNum) throws SQLException {
-				// TODO Auto-generated method stub
-				CategoryDTO objCategoryDTO = new CategoryDTO();
-				objCategoryDTO.setCatID(rs.getInt("cat_id"));
-				objCategoryDTO.setCatgoryName(rs.getString("cat_name"));
+					@Override
+					public CategoryDTO mapRow(ResultSet rs, int rowNum) throws SQLException {
+						// TODO Auto-generated method stub
+						CategoryDTO objCategoryDTO = new CategoryDTO();
+						objCategoryDTO.setCatID(rs.getInt("cat_id"));
+						objCategoryDTO.setCatgoryName(rs.getString("cat_name"));
 
-				java.sql.Timestamp timestamp = rs.getTimestamp("creation_date");
-				objCategoryDTO.setDateCreated(Date.from(timestamp.toInstant()));
-				timestamp = rs.getTimestamp("last_updation_date");
-				objCategoryDTO.setDateLastModified(Date.from(timestamp.toInstant()));
+						java.sql.Timestamp timestamp = rs.getTimestamp("creation_date");
+						objCategoryDTO.setDateCreated(Date.from(timestamp.toInstant()));
+						timestamp = rs.getTimestamp("last_updation_date");
+						objCategoryDTO.setDateLastModified(Date.from(timestamp.toInstant()));
 
-				objCategoryDTO.setRating(rs.getInt("rating"));
+						objCategoryDTO.setRating(rs.getInt("rating"));
 
-				return objCategoryDTO;
-			}
+						return objCategoryDTO;
+					}
 
-		});
+				});
 	}
 
-	@Override
+	// @Override
 	public List<CategoryDTO> findByNameAndPrice(String name, BigDecimal price) {
 		return jdbcTemplate.query("select * from books where name like ? and price <= ?",
 				new Object[] { "%" + name + "%", price }, (rs, rowNum) -> new CategoryDTO(
@@ -163,7 +142,7 @@ public class JdbcCategoryRepository implements CategoryRepository {
 				));
 	}
 
-	@Override
+	// @Override
 	public String findNameById(int id) {
 		return jdbcTemplate.queryForObject("select name from books where id = ?", new Object[] { id }, String.class);
 	}
@@ -188,13 +167,30 @@ public class JdbcCategoryRepository implements CategoryRepository {
 	}
 
 	@Override
+	public int update(CategoryDTO objCategoryDTO) {
+		java.sql.Timestamp date = new java.sql.Timestamp(new java.util.Date().getTime());
+
+		return jdbcTemplate.update("update t_category set cat_name=?,last_updation_date=?,rating=?  where cat_id=?",
+				objCategoryDTO.getCatgoryName(), date, objCategoryDTO.getRating(), objCategoryDTO.getCatID());
+	}
+
+	@Override
 	public int[][] batchUpdate(List<CategoryDTO> books, int batchSize) {
 
-		int[][] updateCounts = jdbcTemplate.batchUpdate("update books set price = ? where id = ?", books, batchSize,
+		int[][] updateCounts = jdbcTemplate.batchUpdate(
+				"update t_category set cat_name=?,last_updation_date=?,rating=?  where cat_id=?", books, batchSize,
 				new ParameterizedPreparedStatementSetter<CategoryDTO>() {
-					public void setValues(PreparedStatement ps, CategoryDTO argument) throws SQLException {
-						// ps.setBigDecimal(1, argument.getPrice());
-						// ps.setLong(2, argument.getId());
+					public void setValues(PreparedStatement ps, CategoryDTO objCategoryDTO) throws SQLException {
+						int j = 1;
+						ps.setString(j++, objCategoryDTO.getCatgoryName());
+
+						java.sql.Timestamp date = new java.sql.Timestamp(new java.util.Date().getTime());
+						ps.setTimestamp(j++, date);
+
+						ps.setInt(j++, objCategoryDTO.getRating());
+
+						// where
+						ps.setInt(j++, objCategoryDTO.getCatID());
 					}
 				});
 		return updateCounts;
@@ -202,14 +198,37 @@ public class JdbcCategoryRepository implements CategoryRepository {
 	}
 
 	@Override
+	public int save(CategoryDTO objCategoryDTO) {
+
+		java.sql.Timestamp date = new java.sql.Timestamp(new java.util.Date().getTime());
+
+		return jdbcTemplate.update(
+				"insert into t_category (cat_id,cat_name,creation_date,last_updation_date,rating) values (?,?,?,?,?)",
+				generateNextsrno(), objCategoryDTO.getCatgoryName(), date, date, objCategoryDTO.getRating());
+	}
+
+	@Override
 	public int[] batchInsert(List<CategoryDTO> books) {
 
-		return this.jdbcTemplate.batchUpdate("insert into books (name, price) values(?,?)",
+		return this.jdbcTemplate.batchUpdate(
+				"insert into t_category (cat_id,cat_name,creation_date,last_updation_date,rating) values (?,?,?,?,?)",
 				new BatchPreparedStatementSetter() {
 
 					public void setValues(PreparedStatement ps, int i) throws SQLException {
 						// ps.setString(1, books.get(i).getName());
 						// ps.setBigDecimal(2, books.get(i).getPrice());
+
+						int j = 1;
+						int nextWish_srno = generateNextsrno();
+
+						ps.setInt(j++, nextWish_srno);
+						ps.setString(j++, books.get(i).getCatgoryName());
+
+						java.sql.Timestamp date = new java.sql.Timestamp(new java.util.Date().getTime());
+						ps.setTimestamp(j++, date);
+						ps.setTimestamp(j++, date);
+
+						ps.setInt(j++, books.get(i).getRating());
 					}
 
 					public int getBatchSize() {
@@ -228,8 +247,17 @@ public class JdbcCategoryRepository implements CategoryRepository {
 		int[][] updateCounts = jdbcTemplate.batchUpdate("insert into books (name, price) values(?,?)", books, batchSize,
 				new ParameterizedPreparedStatementSetter<CategoryDTO>() {
 					public void setValues(PreparedStatement ps, CategoryDTO argument) throws SQLException {
-						// ps.setString(1, argument.getName());
-						// ps.setBigDecimal(2, argument.getPrice());
+						int j = 1;
+						int nextWish_srno = generateNextsrno();
+
+						ps.setInt(j++, nextWish_srno);
+						ps.setString(j++, argument.getCatgoryName());
+
+						java.sql.Timestamp date = new java.sql.Timestamp(new java.util.Date().getTime());
+						ps.setTimestamp(j++, date);
+						ps.setTimestamp(j++, date);
+
+						ps.setInt(j++, argument.getRating());
 					}
 				});
 		return updateCounts;
@@ -238,27 +266,29 @@ public class JdbcCategoryRepository implements CategoryRepository {
 
 	// https://www.postgresql.org/docs/7.3/jdbc-binary-data.html
 	// https://docs.spring.io/spring/docs/current/spring-framework-reference/data-access.html#jdbc-lob
-	@Override
+	// @Override
 	public void saveImage(Long bookId, File image) {
 
-//		try (InputStream imageInStream = new FileInputStream(image)) {
-//
-//			jdbcTemplate.execute("INSERT INTO book_image (book_id, filename, blob_image) VALUES (?, ?, ?)",
-//					new AbstractLobCreatingPreparedStatementCallback(lobHandler) {
-//						protected void setValues(PreparedStatement ps, LobCreator lobCreator) throws SQLException {
-//							ps.setLong(1, 1L);
-//							ps.setString(2, image.getName());
-//							lobCreator.setBlobAsBinaryStream(ps, 3, imageInStream, (int) image.length());
-//						}
-//					});
-//
-//		} catch (IOException e) {
-//			e.printStackTrace();
-//		}
+		// try (InputStream imageInStream = new FileInputStream(image)) {
+		//
+		// jdbcTemplate.execute("INSERT INTO book_image (book_id, filename, blob_image)
+		// VALUES (?, ?, ?)",
+		// new AbstractLobCreatingPreparedStatementCallback(lobHandler) {
+		// protected void setValues(PreparedStatement ps, LobCreator lobCreator) throws
+		// SQLException {
+		// ps.setLong(1, 1L);
+		// ps.setString(2, image.getName());
+		// lobCreator.setBlobAsBinaryStream(ps, 3, imageInStream, (int) image.length());
+		// }
+		// });
+		//
+		// } catch (IOException e) {
+		// e.printStackTrace();
+		// }
 
 	}
 
-	@Override
+	// @Override
 	public List<Map<String, InputStream>> findImageByBookId(Long bookId) {
 
 		List<Map<String, InputStream>> result = jdbcTemplate.query(
@@ -266,8 +296,9 @@ public class JdbcCategoryRepository implements CategoryRepository {
 				new RowMapper<Map<String, InputStream>>() {
 					public Map<String, InputStream> mapRow(ResultSet rs, int i) throws SQLException {
 
-						String fileName = rs.getString("filename");
-//						InputStream blob_image_stream = lobHandler.getBlobAsBinaryStream(rs, "blob_image");
+						// String fileName = rs.getString("filename");
+						// InputStream blob_image_stream = lobHandler.getBlobAsBinaryStream(rs,
+						// "blob_image");
 
 						// byte array
 						// Map<String, Object> results = new HashMap<>();
@@ -275,7 +306,7 @@ public class JdbcCategoryRepository implements CategoryRepository {
 						// results.put("BLOB", blobBytes);
 
 						Map<String, InputStream> results = new HashMap<>();
-//						results.put(fileName, blob_image_stream);
+						// results.put(fileName, blob_image_stream);
 
 						return results;
 
