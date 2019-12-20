@@ -32,9 +32,7 @@ public class InterviewMgmtSpringBootJdbcApplication implements CommandLineRunner
 	public void run(String... args) {
 
 		log.info("StartApplication...");
-
 		// startCustomerApp();
-
 	}
 
 	// private void startCustomerApp() {

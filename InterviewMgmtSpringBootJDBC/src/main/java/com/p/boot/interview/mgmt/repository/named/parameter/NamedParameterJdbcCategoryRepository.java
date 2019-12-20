@@ -1,4 +1,4 @@
-package com.p.boot.interview.mgmt.repository;
+package com.p.boot.interview.mgmt.repository.named.parameter;
 
 import java.sql.Date;
 import java.sql.ResultSet;
@@ -11,6 +11,7 @@ import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.stereotype.Repository;
 
 import com.p.boot.interview.mgmt.pojo.CategoryDTO;
+import com.p.boot.interview.mgmt.repository.jdbc.JdbcCategoryRepository;
 
 @Repository
 public class NamedParameterJdbcCategoryRepository extends JdbcCategoryRepository {

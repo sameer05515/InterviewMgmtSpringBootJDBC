@@ -1,4 +1,4 @@
-package com.p.boot.interview.mgmt.repository;
+package com.p.boot.interview.mgmt.repository.jdbc;
 
 import java.io.File;
 import java.io.InputStream;
@@ -20,6 +20,7 @@ import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.p.boot.interview.mgmt.pojo.CategoryDTO;
+import com.p.boot.interview.mgmt.repository.CategoryRepository;
 
 @Repository
 public class JdbcCategoryRepository implements CategoryRepository {
