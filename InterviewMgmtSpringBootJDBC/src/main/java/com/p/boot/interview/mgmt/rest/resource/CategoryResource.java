@@ -27,6 +27,10 @@ public class CategoryResource {
 
 	/** The Constant logger. */
 	private static final Logger logger = LoggerFactory.getLogger(CategoryResource.class);
+	
+	static {
+		logger.debug("Implementation yet to be written!");
+	}
 
 	@GetMapping(path = "/", produces = "application/json")
 	// @TrackTime

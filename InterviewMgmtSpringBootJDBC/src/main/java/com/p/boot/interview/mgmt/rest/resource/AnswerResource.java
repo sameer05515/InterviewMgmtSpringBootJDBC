@@ -11,5 +11,9 @@ public class AnswerResource {
 	
 	/** The Constant logger. */
 	private static final Logger logger = LoggerFactory.getLogger(AnswerResource.class);
+	
+	static {
+		logger.debug("Implementation yet to be written!");
+	}
 
 }

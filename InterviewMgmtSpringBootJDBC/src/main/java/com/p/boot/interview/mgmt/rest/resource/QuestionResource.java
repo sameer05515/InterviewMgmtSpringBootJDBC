@@ -23,6 +23,10 @@ public class QuestionResource {
 	/** The Constant logger. */
 	private static final Logger logger = LoggerFactory.getLogger(QuestionResource.class);
 	
+	static {
+		logger.debug("Implementation yet to be written!");
+	}
+	
 	@Autowired
 	@Qualifier("namedParameterJdbcQuestionRepository") // Test NamedParameterJdbcTemplate
 	private QuestionRepository questionRepository;
